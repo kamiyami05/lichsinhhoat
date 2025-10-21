@@ -3,99 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar</title>
+    <title>Weekly Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         table {
             border-collapse: collapse;
-            width: 800px;
-            margin: 0 auto;
-            table-layout: fixed;
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
         }
+
         th, td {
-            border: 1px solid black;
-            padding: 20px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: center;
-            width: 100px;
-            word-wrap: break-word;
+            vertical-align: top;
         }
+
+        th {
+            background-color: #4a90e2;
+            color: white;
+            font-weight: 500;
+        }
+
+        td:first-child {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
         input[type="text"] {
-            box-sizing: border-box; /* Đảm bảo rằng kích thước của ô text bao gồm cả padding và border */
-            width: calc(100% - 20px); /* Độ rộng ô text bằng độ rộng của ô td trừ đi tổng padding của ô td */
-            margin: 0;
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             text-align: center;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #clock {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #357ae8;
+        }
+
+        @media (max-width: 768px) {
+            table, th, td {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            textarea {
+                min-height: 60px;
+            }
+
+            #clock {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
-<body background="">
+<body>
+    <div id="clock"></div>
+
     <table>
         <tr>
             <th></th>
-            <th>Monday <input type="text" id="mondayDate"></th>
-            <th>Tuesday <input type="text" id="tuesdayDate"></th>
-            <th>Wednesday <input type="text" id="wednesdayDate"></th>
-            <th>Thursday <input type="text" id="thursdayDate"></th>
-            <th>Friday <input type="text" id="fridayDate"></th>
-            <th>Saturday <input type="text" id="saturdayDate"></th>
-            <th>Sunday <input type="text" id="sundayDate"></th>
+            <th>Monday <input type="text" id="mondayDate" placeholder="Enter date"></th>
+            <th>Tuesday <input type="text" id="tuesdayDate" placeholder="Enter date"></th>
+            <th>Wednesday <input type="text" id="wednesdayDate" placeholder="Enter date"></th>
+            <th>Thursday <input type="text" id="thursdayDate" placeholder="Enter date"></th>
+            <th>Friday <input type="text" id="fridayDate" placeholder="Enter date"></th>
+            <th>Saturday <input type="text" id="saturdayDate" placeholder="Enter date"></th>
+            <th>Sunday <input type="text" id="sundayDate" placeholder="Enter date"></th>
         </tr>
 
         <tr>
             <td>Morning<br>(6h-12h)</td>
-            <td><input type="text" id="mondayMorning"></td>
-            <td><input type="text" id="tuesdayMorning"></td>
-            <td><input type="text" id="wednesdayMorning"></td>
-            <td><input type="text" id="thursdayMorning"></td>
-            <td><input type="text" id="fridayMorning"></td>
-            <td><input type="text" id="saturdayMorning"></td>
-            <td><input type="text" id="sundayMorning"></td>
+            <td><textarea id="mondayMorning" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="tuesdayMorning" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="wednesdayMorning" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="thursdayMorning" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="fridayMorning" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="saturdayMorning" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="sundayMorning" placeholder="Enter notes..."></textarea></td>
         </tr>
 
         <tr>
             <td>Afternoon<br>(12h-18h)</td>
-            <td><input type="text" id="mondayAfternoon"></td>
-            <td><input type="text" id="tuesdayAfternoon"></td>
-            <td><input type="text" id="wednesdayAfternoon"></td>
-            <td><input type="text" id="thursdayAfternoon"></td>
-            <td><input type="text" id="fridayAfternoon"></td>
-            <td><input type="text" id="saturdayAfternoon"></td>
-            <td><input type="text" id="sundayAfternoon"></td>
+            <td><textarea id="mondayAfternoon" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="tuesdayAfternoon" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="wednesdayAfternoon" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="thursdayAfternoon" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="fridayAfternoon" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="saturdayAfternoon" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="sundayAfternoon" placeholder="Enter notes..."></textarea></td>
         </tr>
 
         <tr>
             <td>Evening<br>(18h-6h)</td>
-            <td><input type="text" id="mondayEvening"></td>
-            <td><input type="text" id="tuesdayEvening"></td>
-            <td><input type="text" id="wednesdayEvening"></td>
-            <td><input type="text" id="thursdayEvening"></td>
-            <td><input type="text" id="fridayEvening"></td>
-            <td><input type="text" id="saturdayEvening"></td>
-            <td><input type="text" id="sundayEvening"></td>
+            <td><textarea id="mondayEvening" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="tuesdayEvening" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="wednesdayEvening" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="thursdayEvening" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="fridayEvening" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="saturdayEvening" placeholder="Enter notes..."></textarea></td>
+            <td><textarea id="sundayEvening" placeholder="Enter notes..."></textarea></td>
         </tr>
-
     </table>
 
-    <div id="clock"></div> // hien thi dong ho
+    <button id="clearData">Clear All Data</button>
 
     <script>
         // Khôi phục dữ liệu từ Local Storage khi trang được tải lại
         window.onload = function() {
             restoreData();
             updateClock(); // Gọi hàm cập nhật đồng hồ khi trang tải lại
+            populateDates(); // Gọi hàm để điền ngày tháng năm theo lịch dương
         };
 
-        // Lưu trữ dữ liệu khi người dùng nhập vào ô văn bản
-        document.querySelectorAll('input[type="text"]').forEach(input => {
-            input.addEventListener('input', function() {
+        // Lưu trữ dữ liệu khi người dùng nhập vào input hoặc textarea
+        document.querySelectorAll('input[type="text"], textarea').forEach(element => {
+            element.addEventListener('input', function() {
                 localStorage.setItem(this.id, this.value);
             });
         });
 
         // Hàm khôi phục dữ liệu từ Local Storage
         function restoreData() {
-            document.querySelectorAll('input[type="text"]').forEach(input => {
-                const savedValue = localStorage.getItem(input.id);
+            document.querySelectorAll('input[type="text"], textarea').forEach(element => {
+                const savedValue = localStorage.getItem(element.id);
                 if (savedValue !== null) {
-                    input.value = savedValue;
+                    element.value = savedValue;
                 }
             });
         }
@@ -118,6 +203,38 @@
             // Cập nhật lại đồng hồ mỗi giây
             setTimeout(updateClock, 1000);
         }
+
+        // Hàm điền ngày tháng năm theo lịch dương cho tuần hiện tại
+        function populateDates() {
+            var currentDate = new Date(2025, 9, 21); // October 21, 2025 (tháng trong JS bắt đầu từ 0)
+            var currentDay = currentDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+            // Tính ngày bắt đầu của tuần (Monday)
+            var monday = new Date(currentDate);
+            monday.setDate(monday.getDate() - (currentDay === 0 ? 6 : currentDay - 1));
+
+            // Điền ngày cho từng cột
+            var days = ['mondayDate', 'tuesdayDate', 'wednesdayDate', 'thursdayDate', 'fridayDate', 'saturdayDate', 'sundayDate'];
+            for (var i = 0; i < 7; i++) {
+                var day = new Date(monday);
+                day.setDate(day.getDate() + i);
+                var formattedDate = day.getDate().toString().padStart(2, '0') + '/' +
+                                    (day.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                                    day.getFullYear();
+                var input = document.getElementById(days[i]);
+                if (localStorage.getItem(days[i]) === null) { // Chỉ điền nếu chưa có dữ liệu lưu
+                    input.value = formattedDate;
+                }
+            }
+        }
+
+        // Xóa dữ liệu Local Storage khi nhấn nút
+        document.getElementById('clearData').addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                localStorage.clear();
+                location.reload(); // Tải lại trang để cập nhật
+            }
+        });
     </script>
 </body>
 </html>
