@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Calendar</title>
+    <link rel="icon" type="image/png" href="img/me_but_AL.png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -27,7 +29,8 @@
             overflow: hidden;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: center;
@@ -94,7 +97,10 @@
         }
 
         @media (max-width: 768px) {
-            table, th, td {
+
+            table,
+            th,
+            td {
                 font-size: 12px;
                 padding: 8px;
             }
@@ -109,6 +115,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="clock"></div>
 
@@ -162,7 +169,7 @@
 
     <script>
         // Khôi phục dữ liệu từ Local Storage khi trang được tải lại
-        window.onload = function() {
+        window.onload = function () {
             restoreData();
             updateClock(); // Gọi hàm cập nhật đồng hồ khi trang tải lại
             populateDates(); // Gọi hàm để điền ngày tháng năm theo lịch dương
@@ -170,7 +177,7 @@
 
         // Lưu trữ dữ liệu khi người dùng nhập vào input hoặc textarea
         document.querySelectorAll('input[type="text"], textarea').forEach(element => {
-            element.addEventListener('input', function() {
+            element.addEventListener('input', function () {
                 localStorage.setItem(this.id, this.value);
             });
         });
@@ -219,8 +226,8 @@
                 var day = new Date(monday);
                 day.setDate(day.getDate() + i);
                 var formattedDate = day.getDate().toString().padStart(2, '0') + '/' +
-                                    (day.getMonth() + 1).toString().padStart(2, '0') + '/' +
-                                    day.getFullYear();
+                    (day.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                    day.getFullYear();
                 var input = document.getElementById(days[i]);
                 if (localStorage.getItem(days[i]) === null) { // Chỉ điền nếu chưa có dữ liệu lưu
                     input.value = formattedDate;
@@ -229,7 +236,7 @@
         }
 
         // Xóa dữ liệu Local Storage khi nhấn nút
-        document.getElementById('clearData').addEventListener('click', function() {
+        document.getElementById('clearData').addEventListener('click', function () {
             if (confirm('Are you sure you want to clear all data?')) {
                 localStorage.clear();
                 location.reload(); // Tải lại trang để cập nhật
@@ -237,4 +244,5 @@
         });
     </script>
 </body>
+
 </html>
