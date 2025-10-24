@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Calendar</title>
-    <link rel="icon" type="image/png" href="img/me_but_AL.png">
+    <link rel="icon" type="image/png" href="img/special_image.png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -16,6 +16,84 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+        }
+
+        #selectWeek {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #selectWeek:hover {
+            background-color: #357ae8;
+        }
+
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modalContent {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #modalContent h2 {
+            margin-top: 0;
+        }
+
+        .monthButton,
+        .weekButton {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #4a90e2;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .monthButton:hover,
+        .weekButton:hover {
+            background-color: #357ae8;
+        }
+
+        #closeModal {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #closeModal:hover {
+            background-color: #357ae8;
         }
 
         table {
@@ -79,6 +157,8 @@
             padding: 10px 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            white-space: nowrap;
         }
 
         button {
@@ -112,11 +192,25 @@
             #clock {
                 font-size: 18px;
             }
+
+            #modalContent {
+                width: 90%;
+            }
         }
     </style>
 </head>
 
 <body>
+    <button id="selectWeek">=</button>  
+    <div id="modal">
+        <div id="modalContent">
+            <h2>Select Month and Week</h2>
+            <div id="monthList"></div>
+            <div id="weekList" style="display:none;"></div>
+            <button id="closeModal">Close</button>
+        </div>
+    </div>
+
     <div id="clock"></div>
 
     <table>
@@ -168,21 +262,21 @@
     <button id="clearData">Clear All Data</button>
 
     <script>
-        // Khôi phục dữ liệu từ Local Storage khi trang được tải lại
+        var currentDate = new Date();
+
         window.onload = function () {
             restoreData();
-            updateClock(); // Gọi hàm cập nhật đồng hồ khi trang tải lại
-            populateDates(); // Gọi hàm để điền ngày tháng năm theo lịch dương
+            updateClock();
+            populateDates(currentDate); 
+            setupModal();
         };
 
-        // Lưu trữ dữ liệu khi người dùng nhập vào input hoặc textarea
         document.querySelectorAll('input[type="text"], textarea').forEach(element => {
             element.addEventListener('input', function () {
                 localStorage.setItem(this.id, this.value);
             });
         });
 
-        // Hàm khôi phục dữ liệu từ Local Storage
         function restoreData() {
             document.querySelectorAll('input[type="text"], textarea').forEach(element => {
                 const savedValue = localStorage.getItem(element.id);
@@ -192,54 +286,166 @@
             });
         }
 
-        // Hàm cập nhật đồng hồ
         function updateClock() {
             var now = new Date();
-            var hours = now.getHours();
-            var minutes = now.getMinutes();
-            var seconds = now.getSeconds();
+            var daysOfWeek = [
+                'Sunday',
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday'
+            ];
+            var dayOfWeek = daysOfWeek[now.getDay()];
+            var date = now.getDate().toString().padStart(2, '0');
+            var month = (now.getMonth() + 1).toString().padStart(2, '0');
+            var year = now.getFullYear();
+            var hours = now.getHours().toString().padStart(2, '0');
+            var minutes = now.getMinutes().toString().padStart(2, '0');
+            var seconds = now.getSeconds().toString().padStart(2, '0');
+            var formatted = dayOfWeek + ', ' + date + '/' + month + '/' + year + ' ' + hours + ':' + minutes + ':' + seconds;
+            document.getElementById("clock").innerText = formatted;
 
-            // Định dạng thời gian
-            hours = (hours < 10 ? "0" : "") + hours;
-            minutes = (minutes < 10 ? "0" : "") + minutes;
-            seconds = (seconds < 10 ? "0" : "") + seconds;
-
-            // Hiển thị thời gian trong phần tử div có id "clock"
-            document.getElementById("clock").innerText = hours + ":" + minutes + ":" + seconds;
-
-            // Cập nhật lại đồng hồ mỗi giây
             setTimeout(updateClock, 1000);
         }
 
-        // Hàm điền ngày tháng năm theo lịch dương cho tuần hiện tại
-        function populateDates() {
-            var currentDate = new Date(2025, 9, 21); // October 21, 2025 (tháng trong JS bắt đầu từ 0)
-            var currentDay = currentDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        function populateDates(referenceDate) {
+            var refDay = referenceDate.getDay(); 
+            var monday = new Date(referenceDate);
+            monday.setDate(monday.getDate() - (refDay === 0 ? 6 : refDay - 1));
 
-            // Tính ngày bắt đầu của tuần (Monday)
-            var monday = new Date(currentDate);
-            monday.setDate(monday.getDate() - (currentDay === 0 ? 6 : currentDay - 1));
-
-            // Điền ngày cho từng cột
             var days = ['mondayDate', 'tuesdayDate', 'wednesdayDate', 'thursdayDate', 'fridayDate', 'saturdayDate', 'sundayDate'];
             for (var i = 0; i < 7; i++) {
                 var day = new Date(monday);
                 day.setDate(day.getDate() + i);
                 var formattedDate = day.getDate().toString().padStart(2, '0') + '/' +
-                    (day.getMonth() + 1).toString().padStart(2, '0') + '/' +
-                    day.getFullYear();
+                                    (day.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                                    day.getFullYear();
                 var input = document.getElementById(days[i]);
-                if (localStorage.getItem(days[i]) === null) { // Chỉ điền nếu chưa có dữ liệu lưu
+                if (localStorage.getItem(days[i]) === null || localStorage.getItem(days[i]) === formattedDate) {
                     input.value = formattedDate;
+                    localStorage.setItem(days[i], formattedDate);
                 }
             }
         }
 
-        // Xóa dữ liệu Local Storage khi nhấn nút
-        document.getElementById('clearData').addEventListener('click', function () {
-            if (confirm('Are you sure you want to clear all data?')) {
+        function setupModal() {
+            var modal = document.getElementById('modal');
+            var selectWeekBtn = document.getElementById('selectWeek');
+            var closeModalBtn = document.getElementById('closeModal');
+            var monthList = document.getElementById('monthList');
+            var weekList = document.getElementById('weekList');
+
+            selectWeekBtn.addEventListener('click', function() {
+                populateMonths();
+                monthList.style.display = 'block';
+                weekList.style.display = 'none';
+                modal.style.display = 'flex';
+            });
+
+            closeModalBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        function populateMonths() {
+            var monthList = document.getElementById('monthList');
+            monthList.innerHTML = '';
+            var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            var currentYear = currentDate.getFullYear();
+            var currentMonth = currentDate.getMonth();
+
+            months.forEach(function(month, index) {
+                var btn = document.createElement('button');
+                btn.className = 'monthButton';
+                btn.textContent = month + (index === currentMonth ? ' (Currently)' : '');
+                btn.onclick = function() {
+                    populateWeeks(currentYear, index);
+                };
+                monthList.appendChild(btn);
+            });
+        }
+
+        function populateWeeks(year, month) {
+            var weekList = document.getElementById('weekList');
+            var monthList = document.getElementById('monthList');
+            monthList.style.display = 'none';
+            weekList.innerHTML = '';
+            weekList.style.display = 'block';
+
+            var weeks = getWeeksInMonth(year, month);
+            weeks.forEach(function(week, index) {
+                var startDate = week.start.getDate().toString().padStart(2, '0') + '/' + (week.start.getMonth() + 1).toString().padStart(2, '0');
+                var endDate = week.end.getDate().toString().padStart(2, '0') + '/' + (week.end.getMonth() + 1).toString().padStart(2, '0');
+                var label = 'Tuần ' + (index + 1) + ': ' + startDate + ' - ' + endDate;
+
+                if (isCurrentWeek(week.start, week.end)) {
+                    label += ' (Currently)';
+                }
+
+                var btn = document.createElement('button');
+                btn.className = 'weekButton';
+                btn.textContent = label;
+                btn.onclick = function() {
+                    populateDates(week.start);
+                    document.getElementById('modal').style.display = 'none';
+                };
+                weekList.appendChild(btn);
+            });
+
+            var backBtn = document.createElement('button');
+            backBtn.className = 'weekButton';
+            backBtn.textContent = 'Back to Months';
+            backBtn.onclick = function() {
+                weekList.style.display = 'none';
+                monthList.style.display = 'block';
+            };
+            weekList.appendChild(backBtn);
+        }
+
+        function getWeeksInMonth(year, month) {
+            var firstDate = new Date(year, month, 1);
+            var lastDate = new Date(year, month + 1, 0);
+            var date = new Date(year, month, 1);
+            var firstDay = date.getDay();
+            var mondayOffset = (firstDay === 0 ? 6 : firstDay - 1);
+            var firstMonday = new Date(date);
+            firstMonday.setDate(firstMonday.getDate() - mondayOffset);
+
+            var weeks = [];
+            while (true) {
+                var sunday = new Date(firstMonday);
+                sunday.setDate(sunday.getDate() + 6);
+
+                if (sunday >= firstDate && firstMonday <= lastDate) {
+                    weeks.push({start: new Date(firstMonday), end: new Date(sunday)});
+                } else if (firstMonday > lastDate) {
+                    break;
+                }
+
+                firstMonday.setDate(firstMonday.getDate() + 7);
+
+                if (weeks.length >= 6) break;
+            }
+            return weeks;
+        }
+
+        function isCurrentWeek(start, end) {
+            var today = new Date();
+            return today >= start && today <= end;
+        }
+
+        document.getElementById('clearData').addEventListener('click', function() {
+            if (confirm('Are you sure?')) {
                 localStorage.clear();
-                location.reload(); // Tải lại trang để cập nhật
+                location.reload();
             }
         });
     </script>
