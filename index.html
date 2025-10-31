@@ -74,11 +74,20 @@
             border-radius: 4px;
             cursor: pointer;
             text-align: left;
+            color: white;
         }
 
         .monthButton:hover,
         .weekButton:hover {
             background-color: #357ae8;
+        }
+
+        .current-item {
+            background-color: #28a745 !important;
+        }
+
+        .current-item:hover {
+            background-color: #218838 !important;
         }
 
         #closeModal {
@@ -119,6 +128,11 @@
             background-color: #4a90e2;
             color: white;
             font-weight: 500;
+        }
+
+        th.current-day {
+            background-color: #ffeb3b;
+            color: #333;
         }
 
         td:first-child {
@@ -201,7 +215,7 @@
 </head>
 
 <body>
-    <button id="selectWeek">=</button>  
+    <button id="selectWeek">Select Week</button>  
     <div id="modal">
         <div id="modalContent">
             <h2>Select Month and Week</h2>
@@ -216,13 +230,13 @@
     <table>
         <tr>
             <th></th>
-            <th>Monday <input type="text" id="mondayDate" placeholder="Enter date"></th>
-            <th>Tuesday <input type="text" id="tuesdayDate" placeholder="Enter date"></th>
-            <th>Wednesday <input type="text" id="wednesdayDate" placeholder="Enter date"></th>
-            <th>Thursday <input type="text" id="thursdayDate" placeholder="Enter date"></th>
-            <th>Friday <input type="text" id="fridayDate" placeholder="Enter date"></th>
-            <th>Saturday <input type="text" id="saturdayDate" placeholder="Enter date"></th>
-            <th>Sunday <input type="text" id="sundayDate" placeholder="Enter date"></th>
+            <th>Monday <input type="text" id="mondayDate" placeholder="Enter date" readonly></th>
+            <th>Tuesday <input type="text" id="tuesdayDate" placeholder="Enter date" readonly></th>
+            <th>Wednesday <input type="text" id="wednesdayDate" placeholder="Enter date" readonly></th>
+            <th>Thursday <input type="text" id="thursdayDate" placeholder="Enter date" readonly></th>
+            <th>Friday <input type="text" id="fridayDate" placeholder="Enter date" readonly></th>
+            <th>Saturday <input type="text" id="saturdayDate" placeholder="Enter date" readonly></th>
+            <th>Sunday <input type="text" id="sundayDate" placeholder="Enter date" readonly></th>
         </tr>
 
         <tr>
@@ -259,30 +273,29 @@
         </tr>
     </table>
 
-    <button id="clearData">Clear All Data</button>
+    <button id="clearData">Clear Current Week Data</button>
 
     <script>
         var currentDate = new Date();
+        var currentWeekKey = '';
 
         window.onload = function () {
-            restoreData();
             updateClock();
             populateDates(currentDate); 
+            restoreData();
             setupModal();
         };
 
-        document.querySelectorAll('input[type="text"], textarea').forEach(element => {
+        document.querySelectorAll('textarea').forEach(element => {
             element.addEventListener('input', function () {
-                localStorage.setItem(this.id, this.value);
+                localStorage.setItem(currentWeekKey + '-' + this.id, this.value);
             });
         });
 
         function restoreData() {
-            document.querySelectorAll('input[type="text"], textarea').forEach(element => {
-                const savedValue = localStorage.getItem(element.id);
-                if (savedValue !== null) {
-                    element.value = savedValue;
-                }
+            document.querySelectorAll('textarea').forEach(element => {
+                const savedValue = localStorage.getItem(currentWeekKey + '-' + element.id);
+                element.value = savedValue !== null ? savedValue : '';
             });
         }
 
@@ -314,6 +327,7 @@
             var refDay = referenceDate.getDay(); 
             var monday = new Date(referenceDate);
             monday.setDate(monday.getDate() - (refDay === 0 ? 6 : refDay - 1));
+            currentWeekKey = monday.toISOString().slice(0, 10);
 
             var days = ['mondayDate', 'tuesdayDate', 'wednesdayDate', 'thursdayDate', 'fridayDate', 'saturdayDate', 'sundayDate'];
             for (var i = 0; i < 7; i++) {
@@ -322,12 +336,25 @@
                 var formattedDate = day.getDate().toString().padStart(2, '0') + '/' +
                                     (day.getMonth() + 1).toString().padStart(2, '0') + '/' +
                                     day.getFullYear();
-                var input = document.getElementById(days[i]);
-                if (localStorage.getItem(days[i]) === null || localStorage.getItem(days[i]) === formattedDate) {
-                    input.value = formattedDate;
-                    localStorage.setItem(days[i], formattedDate);
-                }
+                document.getElementById(days[i]).value = formattedDate;
             }
+            highlightCurrentDay();
+            restoreData();
+        }
+
+        function highlightCurrentDay() {
+            var today = new Date();
+            var todayStr = today.getDate().toString().padStart(2, '0') + '/' +
+                           (today.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                           today.getFullYear();
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                var th = input.closest('th');
+                if (input.value === todayStr) {
+                    th.classList.add('current-day');
+                } else {
+                    th.classList.remove('current-day');
+                }
+            });
         }
 
         function setupModal() {
@@ -365,7 +392,11 @@
             months.forEach(function(month, index) {
                 var btn = document.createElement('button');
                 btn.className = 'monthButton';
-                btn.textContent = month + (index === currentMonth ? ' (Currently)' : '');
+                btn.textContent = month;
+                if (index === currentMonth) {
+                    btn.textContent += ' (Current)';
+                    btn.classList.add('current-item');
+                }
                 btn.onclick = function() {
                     populateWeeks(currentYear, index);
                 };
@@ -384,14 +415,14 @@
             weeks.forEach(function(week, index) {
                 var startDate = week.start.getDate().toString().padStart(2, '0') + '/' + (week.start.getMonth() + 1).toString().padStart(2, '0');
                 var endDate = week.end.getDate().toString().padStart(2, '0') + '/' + (week.end.getMonth() + 1).toString().padStart(2, '0');
-                var label = 'Tuần ' + (index + 1) + ': ' + startDate + ' - ' + endDate;
-
-                if (isCurrentWeek(week.start, week.end)) {
-                    label += ' (Currently)';
-                }
+                var label = 'Week ' + (index + 1) + ': ' + startDate + ' - ' + endDate;
 
                 var btn = document.createElement('button');
                 btn.className = 'weekButton';
+                if (isCurrentWeek(week.start, week.end)) {
+                    label += ' (Current)';
+                    btn.classList.add('current-item');
+                }
                 btn.textContent = label;
                 btn.onclick = function() {
                     populateDates(week.start);
@@ -443,9 +474,11 @@
         }
 
         document.getElementById('clearData').addEventListener('click', function() {
-            if (confirm('Are you sure?')) {
-                localStorage.clear();
-                location.reload();
+            if (confirm('Are you sure you want to clear the current week data?')) {
+                document.querySelectorAll('textarea').forEach(element => {
+                    localStorage.removeItem(currentWeekKey + '-' + element.id);
+                    element.value = '';
+                });
             }
         });
     </script>
